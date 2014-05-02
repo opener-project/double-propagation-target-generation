@@ -1,59 +1,108 @@
 package org.openerproject.double_propagation2.graph;
 
+import org.openerproject.double_propagation2.model.DoublePropagationWordType;
+import org.openerproject.double_propagation2.model.PartOfSpeech;
+
 public class DpNode {
 
-	public static enum DpNodeType{
-		TARGET,OPINION;
-	}
-	
+	private String nodeID;
 	private String lemma;
-	private String pos;
-	private DpNodeType type;
+	private PartOfSpeech pos;
+	private DoublePropagationWordType type;
 	private int count;
-	
-	private DpNode(){
-		this.count=0;
+
+	private double score;
+
+	private DpNode(String lemma, PartOfSpeech pos, DoublePropagationWordType type) {
+		this.setLemma(lemma);
+		this.setPos(pos);
+		this.setType(type);
+		this.nodeID = buildNodeID(lemma, pos, type);
+		this.count = 0;
 	}
-	
-	public static DpNode createTargetNode(String lemma,String pos){
-		return createNode(lemma, pos, DpNodeType.TARGET);
+
+	/**
+	 * Creates a new "target" node, with count initialized to 0, so it requires
+	 * a call to increaseCount
+	 * 
+	 * @param lemma
+	 * @param pos
+	 * @return
+	 */
+	public static DpNode createTargetNode(String lemma, PartOfSpeech pos) {
+		return createNode(lemma, pos, DoublePropagationWordType.TARGET);
 	}
-	
-	public static DpNode createOpinionNode(String lemma, String pos){
-		return createNode(lemma, pos, DpNodeType.OPINION);
+
+	/**
+	 * Creates a new "opinion" node, with count initialized to 0, so it requires
+	 * a call to increaseCount
+	 * 
+	 * @param lemma
+	 * @param pos
+	 * @return
+	 */
+	public static DpNode createOpinionNode(String lemma, PartOfSpeech pos) {
+		return createNode(lemma, pos, DoublePropagationWordType.OPINION);
 	}
-	
-	private static DpNode createNode(String lemma,String pos,DpNodeType type){
-		DpNode dpNode=new DpNode();
-		dpNode.setLemma(lemma);
-		dpNode.setPos(pos);
-		dpNode.setType(type);
+
+	private static DpNode createNode(String lemma, PartOfSpeech pos, DoublePropagationWordType type) {
+		DpNode dpNode = new DpNode(lemma, pos, type);
 		return dpNode;
 	}
-	
+
 	public String getLemma() {
 		return lemma;
 	}
+
 	public void setLemma(String lemma) {
 		this.lemma = lemma;
 	}
-	public String getPos() {
+
+	public PartOfSpeech getPos() {
 		return pos;
 	}
-	public void setPos(String pos) {
+
+	public void setPos(PartOfSpeech pos) {
 		this.pos = pos;
 	}
-	public DpNodeType getType() {
+
+	public DoublePropagationWordType getType() {
 		return type;
 	}
-	public void setType(DpNodeType type) {
+
+	public void setType(DoublePropagationWordType type) {
 		this.type = type;
 	}
+
 	public int getCount() {
 		return count;
 	}
-	public void increaseCount(){
+
+	public void increaseCount() {
 		this.count++;
 	}
+
+	public String getNodeID() {
+		return nodeID;
+	}
+
+	public static String buildNodeID(String lemma, PartOfSpeech pos, DoublePropagationWordType type) {
+		return lemma + "_" + pos + "_" + type;
+	}
+
+	public double getScore() {
+		return score;
+	}
+
+	public void setScore(double score) {
+		this.score = score;
+	}
+
+	@Override
+	public String toString() {
+		return "DpNode [nodeID=" + nodeID + ", lemma=" + lemma + ", pos=" + pos + ", type=" + type + ", count=" + count
+				+ ", score=" + score + "]";
+	}
+	
 	
 }

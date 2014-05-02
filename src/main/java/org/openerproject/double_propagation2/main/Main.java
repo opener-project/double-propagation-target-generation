@@ -1,6 +1,8 @@
 package org.openerproject.double_propagation2.main;
 
+import java.io.File;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.cli.BasicParser;
@@ -9,6 +11,10 @@ import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.log4j.Logger;
+import org.openerproject.double_propagation2.algorithm.DoublePropagator;
+import org.openerproject.double_propagation2.data.PlainTextCorpusReader;
+import org.openerproject.double_propagation2.model.PartOfSpeech;
+import org.openerproject.double_propagation2.model.Word;
 import org.openerproject.double_propagation2.multiwords.MultiwordGenerator;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -42,7 +48,9 @@ private static Logger log=Logger.getLogger(Main.class);
 		if(System.console()==null){
 			//if we are not launching from the console (e.g. launching from Eclipse)
 			//then we can simulate the arguments
-			args=new String[]{"-op","collocs","-d","../../target-properties/EN_REVIEWS_KAF","-lang","en","-out","MAIN_OUTPUT","-kaf"};
+			//args=new String[]{"-op","collocs","-d","../../target-properties/EN_REVIEWS_KAF","-lang","en","-out","MAIN_OUTPUT","-kaf"};
+			//Call for the doubleprop
+			args=new String[]{"-op","doubleprop","-d","../../target-properties/EN_REVIEWS_KAF","-lang","en","-out","MAIN_OUTPUT","-kaf"};
 		}
 		execute(args);
 	}
@@ -83,6 +91,18 @@ private static Logger log=Logger.getLogger(Main.class);
 	        		MultiwordGenerator multiwordGenerator=(MultiwordGenerator) getBeanFromContainer("multiwordGenerator");
 	        		log.info("Launching multiword generator with params: corpus-dir="+pathToCorpusDir+" ; lang="+lang+" ; alreadyInKaf="+isKaf+" ; output-folder"+outputPath);
 	        		multiwordGenerator.generateMultiwords(pathToCorpusDir, lang, isKaf, Integer.parseInt(collocNgramSize), Integer.parseInt(collocListSizeLimit), outputPath);
+	        	}else if(operation.equals("doubleprop")){
+	        		DoublePropagator doublePropagator=(DoublePropagator) getBeanFromContainer("doublePropagator");
+	        		////////// AD-HOC STUFF, REMOVE AFTER TEST IT ///////////
+	        		PlainTextCorpusReader plainTextCorpusReader=new PlainTextCorpusReader();
+	        		String corpusContent = plainTextCorpusReader.readCorpusFileContent(new File("C:\\Users\\yo\\Desktop\\git_repos\\target-properties\\CORPUS\\ALL_ENGLISH_REVIEWS.txt"));
+	        		List<String>corpus=Lists.newArrayList(corpusContent.split("\n"));
+	        		Set<Word> seedOpinionWords=new HashSet<Word>();
+	        		seedOpinionWords.add(Word.createWord("good", "good", PartOfSpeech.ADJECTIVE, 0, 0));
+	        		seedOpinionWords.add(Word.createWord("bad", "bad", PartOfSpeech.ADJECTIVE, 0, 0));
+	        		Set<Word> seedtargetWords=new HashSet<Word>();
+					/////////////////////////////////////////////////////////
+	        		doublePropagator.executeDoublePropagation(corpus.subList(0, 100), seedOpinionWords, seedtargetWords, lang);
 	        	}
 	        	
 	        }else{

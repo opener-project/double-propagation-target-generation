@@ -67,4 +67,14 @@
 		<property name="tagsetMapper" ref="kafTagsetMapper"></property>
 	</bean>
 
+<!-- DOUBLE PROPAGATION STUFF -->
+
+<bean id="stanfordBasedAnalyzer" class="org.openerproject.double_propagation2.algorithm.StanfordBasedCorpusAnalyzer">
+</bean>
+
+<bean id="doublePropagator" class="org.openerproject.double_propagation2.algorithm.DoublePropagator">
+	<property name="corpusAnalyzer" ref="stanfordBasedAnalyzer"></property>
+</bean>
+
+
 </beans>
