@@ -1,10 +1,17 @@
 package org.openerproject.double_propagation2.graph;
 
+import java.io.Serializable;
+import java.util.Comparator;
+
 import org.openerproject.double_propagation2.model.DoublePropagationWordType;
 import org.openerproject.double_propagation2.model.PartOfSpeech;
 
-public class DpNode {
+public class DpNode implements Serializable{
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private String nodeID;
 	private String lemma;
 	private PartOfSpeech pos;
@@ -104,5 +111,62 @@ public class DpNode {
 				+ ", score=" + score + "]";
 	}
 	
+	public static class DpNodeScoreComparator implements Comparator<DpNode>{
+
+		private boolean ascendingOrder;
+		private DpNodeScoreComparator(boolean ascendingOrder){
+			super();
+			this.ascendingOrder=ascendingOrder;
+		}
+		
+		public static DpNodeScoreComparator create(boolean ascendingOrder){
+			return new DpNodeScoreComparator(ascendingOrder);
+		}
+		
+		@Override
+		public int compare(DpNode o1, DpNode o2) {
+			int compValue;
+			if(ascendingOrder){
+				compValue= Double.compare(o1.getScore(), o2.getScore());
+			}else{//descending order
+				compValue= Double.compare(o2.getScore(), o1.getScore());
+			}
+			if(compValue==0){
+				return o1.getNodeID().compareTo(o2.nodeID);
+			}else{
+				return compValue;
+			}
+		}
+		
+	}
+	
+	public static class DpNodeFrequencyComparator implements Comparator<DpNode>{
+
+		private boolean ascendingOrder;
+		private DpNodeFrequencyComparator(boolean ascendingOrder){
+			super();
+			this.ascendingOrder=ascendingOrder;
+		}
+		
+		public static DpNodeFrequencyComparator create(boolean ascendingOrder){
+			return new DpNodeFrequencyComparator(ascendingOrder);
+		}
+		
+		@Override
+		public int compare(DpNode o1, DpNode o2) {
+			int compValue;
+			if(ascendingOrder){
+				compValue=Integer.compare(o1.getCount(), o2.getCount());
+			}else{//descending order
+				compValue= Integer.compare(o2.getCount(), o1.getCount());
+			}
+			if(compValue==0){
+				return o1.getNodeID().compareTo(o2.nodeID);
+			}else{
+				return compValue;
+			}
+		}
+		
+	}
 	
 }

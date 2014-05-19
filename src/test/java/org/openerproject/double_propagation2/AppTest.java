@@ -1,4 +1,4 @@
-package org.vicomtech.opener.double_propagation2;
+package org.openerproject.double_propagation2;
 
 import junit.framework.Test;
 import junit.framework.TestCase;

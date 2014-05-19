@@ -20,6 +20,7 @@ import org.openerproject.double_propagation2.graph.DpNode;
 import org.openerproject.double_propagation2.model.DoublePropagationWordType;
 import org.openerproject.double_propagation2.model.IntraSentenceWordRelations;
 import org.openerproject.double_propagation2.model.Word;
+import org.openerproject.double_propagation2.multiwords.MultiwordChecker;
 
 import com.google.common.collect.Lists;
 
@@ -52,14 +53,17 @@ public class DoublePropagator {
 		super();
 	}
 	
-	public void executeDoublePropagation(List<String>corpus,Set<Word>seedOpinionWords,Set<Word>seedtargetWords,String language){
+	public void executeDoublePropagation(List<String>corpus,Set<Word>seedOpinionWords,Set<Word>seedtargetWords,String language, boolean detectMultiwords, List<String>multiwords){
 		initialize(seedOpinionWords,seedtargetWords);
 		List<IntraSentenceWordRelations> intraSentenceWordRelationList = analyzedCorpus(corpus, language);
-		executeDoublePropatation(intraSentenceWordRelationList, seedOpinionWords, seedtargetWords);
+		executeDoublePropatation(intraSentenceWordRelationList, seedOpinionWords, seedtargetWords, detectMultiwords,multiwords);
 		
 	}
 	
-	public void executeDoublePropatation(List<IntraSentenceWordRelations>intraSentenceWordRelationList,Set<Word>seedOpinionWords,Set<Word>seedtargetWords){
+	public void executeDoublePropatation(List<IntraSentenceWordRelations>intraSentenceWordRelationList,Set<Word>seedOpinionWords,Set<Word>seedtargetWords, boolean detectMultiwords,List<String>multiwords){
+		if(detectMultiwords){
+			mergeMultiwords(intraSentenceWordRelationList, multiwords);
+		}
 		int previousNodesCount = 0;
 		int round = 0;
 		while (previousNodesCount != dpGraph.getNodesCount()) {
@@ -204,6 +208,19 @@ public class DoublePropagator {
 		this.corpusAnalyzer = corpusAnalyzer;
 	}
 	
+	public DoublePropagationGraph getDoublePropagationGraph(){
+		return this.dpGraph;
+	}
 	
-	
+	/**
+	 * This method call the detect and merge multiwords for each IntraSentenceWordRelations object. (Note that the actual input objects are altered)
+	 * @param intraSentenceWordRelations
+	 * @param multiwords
+	 */
+	protected void mergeMultiwords(List<IntraSentenceWordRelations>intraSentenceWordRelations, List<String>multiwords){
+		MultiwordChecker multiwordChecker=MultiwordChecker.createMultiworChecker(multiwords);
+		for(IntraSentenceWordRelations intraSentenceWordRelation:intraSentenceWordRelations){
+			intraSentenceWordRelation.detectAndMergeMultiwords(multiwordChecker);
+		}
+	}
 }

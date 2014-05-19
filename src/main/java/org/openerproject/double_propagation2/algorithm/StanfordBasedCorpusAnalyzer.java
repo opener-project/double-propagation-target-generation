@@ -72,13 +72,11 @@ public class StanfordBasedCorpusAnalyzer implements CorpusAnalyzer{
 		for(IndexedWord iw:semanticGraph.descendants(semanticGraph.getFirstRoot())){
 			List<SemanticGraphEdge> incomingEdges = semanticGraph.getIncomingEdgesSorted(iw);
 			for(SemanticGraphEdge edge:incomingEdges){
-				WordToWordRelation wordToWordRelation=new WordToWordRelation();
-				wordToWordRelation.setSourceWord(mapIndexedWordToWord(edge.getGovernor()));
-				wordToWordRelation.setTargetWord(mapIndexedWordToWord(edge.getDependent()));
-				wordToWordRelation.setRelType(mapRelationTypes(edge.getRelation().getShortName()));
+				WordToWordRelation wordToWordRelation=WordToWordRelation.createWordToWordRelation(mapIndexedWordToWord(edge.getGovernor()), mapIndexedWordToWord(edge.getDependent()), mapRelationTypes(edge.getRelation().getShortName()));
 				intraSentenceWordRelations.addWordToWordRelation(wordToWordRelation);
 			}
 		}
+		//intraSentenceWordRelations.detectAndMergeMultiwords();
 		return intraSentenceWordRelations;
 	}
 	

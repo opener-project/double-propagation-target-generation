@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.openerproject.double_propagation2.multiwords.MultiwordChecker;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Lists;
@@ -26,9 +27,9 @@ public class IntraSentenceWordRelations {
 	private static Logger log=Logger.getLogger(IntraSentenceWordRelations.class);
 	
 	//Map with the relations where the word is the governor (i.e. the origin of the arc) nsubj(has,something) --> has is the governor
-	private Multimap<Word, WordToWordRelation> governorWordRelationMap;
+	private Multimap<String, WordToWordRelation> governorWordRelationMap;
 	//Map with the relations where the word is the dependent (i.e. the destination of the arc) nsubj(has,something) --> something is the dependent
-	private Multimap<Word, WordToWordRelation> dependentWordRelationMap;
+	private Multimap<String, WordToWordRelation> dependentWordRelationMap;
 	private List<Word> sentenceWords;
 	
 	private Map<String,Integer>spanToWordNumberMap;
@@ -50,9 +51,13 @@ public class IntraSentenceWordRelations {
 		return new IntraSentenceWordRelations();
 	}
 
+	/**
+	 * Adds the input relation for later use
+	 * @param wordToWordRelation
+	 */
 	public void addWordToWordRelation(WordToWordRelation wordToWordRelation) {
-		governorWordRelationMap.put(wordToWordRelation.getSourceWord(), wordToWordRelation);
-		dependentWordRelationMap.put(wordToWordRelation.getTargetWord(), wordToWordRelation);
+		governorWordRelationMap.put(wordToWordRelation.getSourceWord().getSpanSignature(), wordToWordRelation);
+		dependentWordRelationMap.put(wordToWordRelation.getTargetWord().getSpanSignature(), wordToWordRelation);
 		addToSentenceWordsInOrder(wordToWordRelation);
 	}
 	
@@ -70,11 +75,13 @@ public class IntraSentenceWordRelations {
 				}else{
 					//general case, look for the first word that goes after the word we want to add, and add at that point
 					boolean added=false;
+					boolean theVerySameWordAlreadyInTheList=false;
 					for(int i=0;i<sentenceWords.size();i++){
 						Word iesimWord=sentenceWords.get(i);
 						if(word.isSameWordInTheSentenceThan(iesimWord)){
 							//if is the same word, because it participates in many relations as the governor (i.e. the beautiful eye -> the->eye, beautiful->eye)
 							//the break, it must not be added again
+							theVerySameWordAlreadyInTheList=true;
 							break;
 						}else if(word.isPreviousWordInTheSentenceThan(iesimWord)){
 							sentenceWords.add(i, word);
@@ -83,7 +90,8 @@ public class IntraSentenceWordRelations {
 						}
 					}
 					//special case, the word is the last of the current list
-					if(!added){
+					boolean weHaveBrokenTheLoopOnPurpose=added || theVerySameWordAlreadyInTheList;
+					if(!weHaveBrokenTheLoopOnPurpose){
 						sentenceWords.add(word);
 					}
 				}
@@ -91,7 +99,7 @@ public class IntraSentenceWordRelations {
 
 	//ATTENTION: The semantics of this method is to get the words that are dependents to the given one in a certain type of relations
 	public List<Word> getWordsGovernedByThis(Word aWord, RelationTypes relType) {
-		Collection<WordToWordRelation> relatedWords = governorWordRelationMap.get(aWord);
+		Collection<WordToWordRelation> relatedWords = governorWordRelationMap.get(aWord.getSpanSignature());
 		Iterator<WordToWordRelation> relatedWordsIterator = relatedWords.iterator();
 		List<Word> results = Lists.newArrayList();
 		while (relatedWordsIterator.hasNext()) {
@@ -105,7 +113,7 @@ public class IntraSentenceWordRelations {
 	
 	//ATTENTION: Here the index (i.e. the map) is about dependent words, so it must return the SOURCE WORD (as opposite to the getWordsGovernedBy)
 	public List<Word> getWordsGoverningThis(Word aWord, RelationTypes relType){
-		Collection<WordToWordRelation> relatedWords = dependentWordRelationMap.get(aWord);
+		Collection<WordToWordRelation> relatedWords = dependentWordRelationMap.get(aWord.getSpanSignature());
 		Iterator<WordToWordRelation> relatedWordsIterator = relatedWords.iterator();
 		List<Word> results = Lists.newArrayList();
 		while (relatedWordsIterator.hasNext()) {
@@ -149,6 +157,59 @@ public class IntraSentenceWordRelations {
 		}
 		
 		return wordNumber;
+	}
+	
+	/*
+	 * Multiword list should be loaded and managed in other place, not here
+	 */
+	public void detectAndMergeMultiwords(MultiwordChecker multiwordChecker){
+//		for(Entry<String, WordToWordRelation> entry:governorWordRelationMap.entries()){
+//			log.debug("GOVERNOR_MAP:"+entry);
+//		}
+//		for(Entry<String, WordToWordRelation> entry:dependentWordRelationMap.entries()){
+//			log.debug("DEPENDENT_MAP:"+entry);
+//		}
+		//MultiwordChecker multiwordChecker=MultiwordChecker.createMultiworChecker(null);
+		List<Word> mergedWords = multiwordChecker.checkMultiwords(sentenceWords);
+		//now check the multiwords (composing words inside each Word object) to perform the reassignment of the dependencies
+		for(Word mergedWord:mergedWords){
+			if(mergedWord.isMultiword()){
+				List<Word> composingWords = mergedWord.getComposingWords();
+				for(Word innerWord:composingWords){
+					Iterator<WordToWordRelation> governorRels = governorWordRelationMap.get(innerWord.getSpanSignature()).iterator();
+					while(governorRels.hasNext()){
+						WordToWordRelation rel = governorRels.next();
+						rel.setSourceWord(mergedWord);
+						if(!composingWords.contains(rel.getTargetWord()) && !rel.getSourceWord().isSameWordInTheSentenceThan(rel.getTargetWord())){
+							
+							governorWordRelationMap.put(mergedWord.getSpanSignature(), rel);
+						}
+					}
+					log.debug("REMOVING INNER WORD FROM GOVERNORMAP: "+innerWord);
+					governorWordRelationMap.removeAll(innerWord);
+					Iterator<WordToWordRelation> dependentRels = dependentWordRelationMap.get(innerWord.getSpanSignature()).iterator();
+					while(dependentRels.hasNext()){
+						WordToWordRelation rel = dependentRels.next();
+						rel.setTargetWord(mergedWord);
+						if(!composingWords.contains(rel.getSourceWord()) && !rel.getSourceWord().isSameWordInTheSentenceThan(rel.getTargetWord())){
+							
+							dependentWordRelationMap.put(mergedWord.getSpanSignature(), rel);
+						}
+					}
+					log.debug("REMOVING INNER WORD FROM DEPENDENTMAP: "+innerWord);
+					dependentWordRelationMap.removeAll(innerWord);
+				}
+			}
+		}
+		this.sentenceWords=mergedWords;
+		populateSpanToWorNumberMap();
+		
+//		for(Entry<String, WordToWordRelation> entry:governorWordRelationMap.entries()){
+//			log.debug("GOVERNOR_MAP:"+entry);
+//		}
+//		for(Entry<String, WordToWordRelation> entry:dependentWordRelationMap.entries()){
+//			log.debug("DEPENDENT_MAP:"+entry);
+//		}
 	}
 
 }

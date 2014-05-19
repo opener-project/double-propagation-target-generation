@@ -2,5 +2,5 @@
 .project
 .classpath
 target/
-MAIN_OUTPUT/
+MAIN_OUTPUT*/
 log/

@@ -6,6 +6,16 @@ public class WordToWordRelation {
 	private RelationTypes relType;
 	private Word targetWord;
 
+	private WordToWordRelation(Word sourceWord,Word targetWord,RelationTypes relType){
+		this.sourceWord=sourceWord;
+		this.targetWord=targetWord;
+		this.relType=relType;
+	}
+	
+	public static WordToWordRelation createWordToWordRelation(Word sourceWord,Word targetWord,RelationTypes relType){
+		return new WordToWordRelation(sourceWord, targetWord, relType);
+	}
+	
 	public Word getTargetWord() {
 		return targetWord;
 	}
@@ -30,4 +40,11 @@ public class WordToWordRelation {
 		this.sourceWord = sourceWord;
 	}
 
+	@Override
+	public String toString() {
+		return "WordToWordRelation [sourceWord=" + sourceWord + ", relType=" + relType + ", targetWord=" + targetWord
+				+ "]";
+	}
+
+	
 }

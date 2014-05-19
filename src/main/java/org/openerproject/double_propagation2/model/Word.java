@@ -1,5 +1,6 @@
 package org.openerproject.double_propagation2.model;
 
+import java.util.Collections;
 import java.util.List;
 
 import com.google.common.collect.Lists;
@@ -21,32 +22,56 @@ public class Word {
 
 	private List<Word> composingWords;
 
-	private Word() {
+//	private Word() {
+//
+//	}
 
-	}
-
-	private Word(String wordForm, String lemma, PartOfSpeech postag, int beginPosition, int endPosition) {
+	private Word(String wordForm, String lemma, PartOfSpeech postag, int beginPosition, int endPosition, List<Word>composingWords) {
+		super();
 		this.wordForm = wordForm;
 		this.lemma = lemma;
 		this.postag = postag;
 		this.span = new CharacterSpan(beginPosition, endPosition);
-		composingWords = Lists.newArrayList();
-		// Cuidado con esta chorrrada que es peligrosa, lo pongo sólo
-		// provisional!
-		// composingWords.add(this);
+		this.composingWords = composingWords;
 	}
 
 	public static Word createWord(String wordForm, String lemma, PartOfSpeech postag, int beginPosition, int endPosition) {
-		// TODO EL TAG MAPPING NO SE TIENE QUE HACER AQUI!!!
-		// DEPENDE DE LA LIBRERÍA QUE SE ESTE USANDO, ASÍ QUE VA EN SU
-		// IMPLEMENTACIÓN DE ANALYZER PARTICULAR
-		return new Word(wordForm, lemma, postag, beginPosition, endPosition);
+		return new Word(wordForm, lemma, postag, beginPosition, endPosition, Collections.<Word>emptyList());
 	}
 
-	public static Word createWord(List<String> wordForms, List<String> lemmas, List<PartOfSpeech> postags,
-			int beginPosition, int endPosition) {
-
-		return null;
+	public static Word createMultiword(List<String> wordForms, List<String> lemmas, List<PartOfSpeech> postags,
+			List<Integer> beginPositions, List<Integer> endPositions) {
+		List<Word>composingWords=Lists.newArrayList();
+		StringBuffer composedWordForm=new StringBuffer();
+		StringBuffer composedLemma=new StringBuffer();
+		PartOfSpeech composedPosTag=PartOfSpeech.MULTIWORD;
+		for(int i=0;i<wordForms.size();i++){
+			String wordForm=wordForms.get(i);
+			composedWordForm.append(wordForm);
+			composedWordForm.append(" ");
+			String lemma=lemmas.get(i);
+			composedLemma.append(lemma);
+			composedLemma.append(" ");
+			PartOfSpeech postag=postags.get(i);
+			Word word=createWord(wordForm,lemma ,postag , beginPositions.get(i), endPositions.get(i));
+			composingWords.add(word);
+		}
+		Word word=new Word(composedWordForm.toString().trim(), composedLemma.toString().trim(), composedPosTag, beginPositions.get(0), endPositions.get(endPositions.size()-1),composingWords);
+		return word;
+	}
+	
+	public static Word createMultiword(List<Word>singleWords) {
+		StringBuffer composedWordForm=new StringBuffer();
+		StringBuffer composedLemma=new StringBuffer();
+		PartOfSpeech composedPosTag=PartOfSpeech.MULTIWORD;
+		for(Word singleWord:singleWords){
+			composedWordForm.append(singleWord.wordForm);
+			composedWordForm.append(" ");
+			composedLemma.append(singleWord.getLemma());
+			composedLemma.append(" ");
+		}
+		Word word=new Word(composedWordForm.toString().trim(), composedLemma.toString().trim(), composedPosTag, singleWords.get(0).span.begin, singleWords.get(singleWords.size()-1).span.end,singleWords);
+		return word;
 	}
 
 	public String getWordForm() {
@@ -83,6 +108,14 @@ public class Word {
 
 	public void setPostag(PartOfSpeech postag) {
 		this.postag = postag;
+	}
+	
+	public boolean isMultiword(){
+		return !composingWords.isEmpty();
+	}
+	
+	public List<Word>getComposingWords(){
+		return this.composingWords;
 	}
 
 	protected static class CharacterSpan {

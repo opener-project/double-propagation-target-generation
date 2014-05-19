@@ -11,9 +11,9 @@ import org.apache.log4j.Logger;
 
 import com.google.common.collect.Lists;
 
-public class MultiwordDocumentPreprocessor implements DocumentPreprocessor{
+public class KafBasedMultiwordDocumentPreprocessor implements DocumentPreprocessor{
 
-	private static Logger log=Logger.getLogger(MultiwordDocumentPreprocessor.class);
+	private static Logger log=Logger.getLogger(KafBasedMultiwordDocumentPreprocessor.class);
 	
 	@Override
 	public List<String> preprocessDocument(String content, String language, boolean isKaf) {
@@ -21,7 +21,7 @@ public class MultiwordDocumentPreprocessor implements DocumentPreprocessor{
 			List<String> preprocessedResults = getPreprocessedContent(content);
 			return preprocessedResults;
 		}else{
-			throw new RuntimeException("Let's assume that for now only KAF is accepted!");
+			throw new RuntimeException("Using KafBasedMultiwordDocumentPreprocessor, but kaf flag set to false. Let's assume that for now only KAF is accepted!");
 		}
 	}
 	

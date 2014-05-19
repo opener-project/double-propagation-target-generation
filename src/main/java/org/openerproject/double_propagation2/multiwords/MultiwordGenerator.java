@@ -27,30 +27,56 @@ import com.google.common.collect.Sets;
 public class MultiwordGenerator {
 
 	private static Logger log=Logger.getLogger(MultiwordGenerator.class);
-	public static final String MULTIWORDS_FILE_NAME="generated-collocations.txt";
+	public static final String MULTIWORDS_BASE_FILE_NAME="generated-collocations.txt";
 	
 	private CorpusReader corpusReader;
 	private DocumentPreprocessor documentPreprocessor;
 	private NgramCountTable ngramCountTable;
 	private AbstractTagsetMapper tagsetMapper;
 
-	public void generateMultiwords(String pathToDir, String language, boolean isKaf,int collocNGramSize, int listSizeLimit, String outputFilePath) {
+	public List<NGramAndScore> generateMultiwords(String pathToDir, String language, boolean isKaf,int collocNGramSize, int listSizeLimit, String outputDirPath) {
 		ngramCountTable = NgramCountTable.createTable();
 		List<File> corpusFiles = CorpusHandlingUtils.getFilesFromDir(pathToDir);
 		int textCount = 1;
 		int numTexts=corpusFiles.size();
 		for (File corpusFile : corpusFiles) {
-			log.debug("Obtaining ngrams from text: " + (textCount++) +" of "+numTexts);
-			String content = corpusReader.readCorpusFileContent(corpusFile);
-			List<String> preprocessedTexts = documentPreprocessor.preprocessDocument(content, language, isKaf);
+			//log.debug("Obtaining ngrams from text: " + (textCount++) +" of "+numTexts);
+			String content = corpusReader.readCorpusFileContent(corpusFile.getAbsolutePath());
+			String[] contentLines=content.split("\n");
+			List<String> preprocessedTexts=Lists.newArrayList();
+			int lineCount=1;
+			for(String contentLine:contentLines){
+				log.debug("Obtaining ngrams from line "+(lineCount)+" of "+contentLines.length+" from text " + (textCount) +" of "+numTexts);
+				preprocessedTexts.addAll(documentPreprocessor.preprocessDocument(contentLine, language, isKaf));
+				lineCount++;
+			}
+			textCount++;
 			addGramsToTable(preprocessedTexts,collocNGramSize);
 		}
 
 		scoreGrams();
 		List<NGramAndScore> rankedGrams = rankGramsAndCropList(listSizeLimit);
-		File outputfile=new File(outputFilePath+File.separator+MULTIWORDS_FILE_NAME);
+		return rankedGrams;
+//		File outputfile=new File(CorpusHandlingUtils.generateUniqueFileName(outputDirPath+File.separator+MULTIWORDS_BASE_FILE_NAME));
+//		try {
+//			FileUtils.writeLines(outputfile,"UTF-8", rankedGrams);
+//		} catch (IOException e) {
+//			throw new RuntimeException(e);
+//		}
+	}
+	
+	/**
+	 * Writes ranked ngram list (multiwords) to the given directory. The precise filename policy is managed inside.
+	 * The function returns the absolute path to the file containing the written multiwords.
+	 * @param rankedGrams
+	 * @param outputDirPath
+	 * @return
+	 */
+	public String writeMultiwordsToFile(List<NGramAndScore>rankedGrams, String outputDirPath){
+		File outputfile=new File(CorpusHandlingUtils.generateUniqueFileName(outputDirPath+File.separator+MULTIWORDS_BASE_FILE_NAME));
 		try {
 			FileUtils.writeLines(outputfile,"UTF-8", rankedGrams);
+			return outputfile.getAbsolutePath();
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}

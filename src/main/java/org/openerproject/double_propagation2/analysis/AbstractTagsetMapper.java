@@ -54,6 +54,15 @@ public abstract class AbstractTagsetMapper {
 		}
 	}
 	
+	final public PartOfSpeech getMappedPosType(String aTag){
+		for(PartOfSpeech posType:postagsMap.keySet()){
+			if(postagsMap.get(posType).equals(aTag)){
+				return posType;
+			}
+		}
+		return PartOfSpeech.OTHER;
+	}
+	
 	protected abstract void loadMappings();
 
 }

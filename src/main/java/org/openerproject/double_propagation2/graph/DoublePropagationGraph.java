@@ -1,7 +1,10 @@
 package org.openerproject.double_propagation2.graph;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 import org.apache.commons.collections15.Transformer;
 import org.apache.log4j.Logger;
@@ -13,19 +16,24 @@ import edu.uci.ics.jung.algorithms.scoring.PageRank;
 import edu.uci.ics.jung.graph.DirectedSparseMultigraph;
 import edu.uci.ics.jung.graph.Graph;
 
-public class DoublePropagationGraph {
+public class DoublePropagationGraph implements Serializable{
 
-	private static Logger log=Logger.getLogger(DoublePropagationGraph.class);
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	private transient static Logger log=Logger.getLogger(DoublePropagationGraph.class);
 	
 	Map<String, DpNode> nodes;
 	Map<String, DpEdge> edges;
 
-	private Graph<DpNode, DpEdge> jungGraph;
-	private Transformer<DpEdge, Double> edgeWeightTransformer = new Transformer<DpEdge, Double>() {
-		public Double transform(DpEdge dpEdge) {
-			return (double) dpEdge.getCount();
-		}
-	};
+//	private Graph<DpNode, DpEdge> jungGraph;
+//	private Transformer<DpEdge, Double> edgeWeightTransformer = new Transformer<DpEdge, Double>() {
+//		public Double transform(DpEdge dpEdge) {
+//			return (double) dpEdge.getCount();
+//		}
+//	};
 
 	public DoublePropagationGraph(){
 		nodes=new HashMap<String,DpNode>();
@@ -47,7 +55,12 @@ public class DoublePropagationGraph {
 	}
 	
 	public void calculateNodeScores() {
-		jungGraph = new DirectedSparseMultigraph<DpNode, DpEdge>();
+		Graph<DpNode, DpEdge> jungGraph = new DirectedSparseMultigraph<DpNode, DpEdge>();
+		Transformer<DpEdge, Double> edgeWeightTransformer = new Transformer<DpEdge, Double>() {
+			public Double transform(DpEdge dpEdge) {
+				return (double) dpEdge.getCount();
+			}
+		};
 		//First add all vertex, to prevent the nodes not participating in any relation (i.e. unused seed words) to cause problems
 		//Since all the time are the very same nodes (references) it should not affect the final number of nodes in the jung graph
 		for(String dpNodeID:nodes.keySet()){
@@ -137,6 +150,22 @@ public class DoublePropagationGraph {
 		}
 		dpEdge.increaseCount();
 		// return dpEdge;
+	}
+	
+	public Set<DpNode> getDpNodesOrderedByScore(boolean ascendingOrder){
+		TreeSet<DpNode>orderedNodeSet=new TreeSet<DpNode>(DpNode.DpNodeScoreComparator.create(ascendingOrder));
+		for(String key:nodes.keySet()){
+			orderedNodeSet.add(nodes.get(key));
+		}
+		return orderedNodeSet;
+	}
+	
+	public Set<DpNode> getDpNodesOrderedByFrequency(boolean ascendingOrder){
+		TreeSet<DpNode>orderedNodeSet=new TreeSet<DpNode>(DpNode.DpNodeFrequencyComparator.create(ascendingOrder));
+		for(String key:nodes.keySet()){
+			orderedNodeSet.add(nodes.get(key));
+		}
+		return orderedNodeSet;
 	}
 
 }

@@ -1,6 +1,13 @@
 package org.openerproject.double_propagation2.graph;
 
-public class DpEdge {
+import java.io.Serializable;
+
+public class DpEdge implements Serializable{
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 
 	private String edgeID;
 	

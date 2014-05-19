@@ -50,8 +50,8 @@
 		class="org.openerproject.double_propagation2.data.PlainTextCorpusReader">
 	</bean>
 
-	<bean id="multiwordDocumentPreprocessor"
-		class="org.openerproject.double_propagation2.multiwords.MultiwordDocumentPreprocessor">
+	<bean id="kafBasedMultiwordDocumentPreprocessor"
+		class="org.openerproject.double_propagation2.multiwords.KafBasedMultiwordDocumentPreprocessor">
 		<!-- <property name="analyzer" ref="kafAnalyzer"></property> -->
 	</bean>
 	
@@ -61,10 +61,15 @@
 	
 	<bean id="stanfordNLPToolsTagsetMapper" class="org.openerproject.double_propagation2.analysis.StanfordNLPToolsTagsetMapper"></bean>
 
+	<bean id="stanfordBasedMultiwordDocumentPreprocessor" class="org.openerproject.double_propagation2.multiwords.StanfordBasedMultiwordDocumentPreprocessor">
+	</bean>
+
 	<bean id="multiwordGenerator" class="org.openerproject.double_propagation2.multiwords.MultiwordGenerator">
 		<property name="corpusReader" ref="plainTextCorpusReader"></property>
-		<property name="documentPreprocessor" ref="multiwordDocumentPreprocessor"></property>
-		<property name="tagsetMapper" ref="kafTagsetMapper"></property>
+		<!-- <property name="documentPreprocessor" ref="kafBasedMultiwordDocumentPreprocessor"></property> -->
+		 <property name="documentPreprocessor" ref="stanfordBasedMultiwordDocumentPreprocessor"></property>
+		<!-- <property name="tagsetMapper" ref="kafTagsetMapper"></property> -->
+		<property name="tagsetMapper" ref="stanfordNLPToolsTagsetMapper"></property>
 	</bean>
 
 <!-- DOUBLE PROPAGATION STUFF -->
