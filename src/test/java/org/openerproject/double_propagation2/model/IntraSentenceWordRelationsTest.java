@@ -39,35 +39,35 @@ public class IntraSentenceWordRelationsTest {
 		}
 	}
 
-	@Test
-	public void testGetWordsGovernedByThis() {
-		fail("Not yet implemented");
-	}
-
-	@Test
-	public void testGetWordsGoverningThis() {
-		fail("Not yet implemented");
-	}
-
-	@Test
-	public void testGetWord() {
-		fail("Not yet implemented");
-	}
-
-	@Test
-	public void testGetNumberOfWordsInThisSentence() {
-		fail("Not yet implemented");
-	}
-
-	@Test
-	public void testPopulateSpanToWorNumberMap() {
-		fail("Not yet implemented");
-	}
-
-	@Test
-	public void testGetWordNumber() {
-		fail("Not yet implemented");
-	}
+//	@Test
+//	public void testGetWordsGovernedByThis() {
+//		fail("Not yet implemented");
+//	}
+//
+//	@Test
+//	public void testGetWordsGoverningThis() {
+//		fail("Not yet implemented");
+//	}
+//
+//	@Test
+//	public void testGetWord() {
+//		fail("Not yet implemented");
+//	}
+//
+//	@Test
+//	public void testGetNumberOfWordsInThisSentence() {
+//		fail("Not yet implemented");
+//	}
+//
+//	@Test
+//	public void testPopulateSpanToWorNumberMap() {
+//		fail("Not yet implemented");
+//	}
+//
+//	@Test
+//	public void testGetWordNumber() {
+//		fail("Not yet implemented");
+//	}
 
 	@Test
 	public void testDetectAndMergeMultiwords() {

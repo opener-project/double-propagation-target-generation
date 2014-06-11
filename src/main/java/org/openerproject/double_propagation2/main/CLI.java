@@ -1,6 +1,7 @@
 package org.openerproject.double_propagation2.main;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -19,6 +20,7 @@ import org.openerproject.double_propagation2.data.PlainTextCorpusReader;
 import org.openerproject.double_propagation2.graph.DoublePropagationGraph;
 import org.openerproject.double_propagation2.graph.utils.DoublePropagationGraphObjectSerializer;
 import org.openerproject.double_propagation2.graph.utils.DoublePropagationGraphSerializer;
+import org.openerproject.double_propagation2.graph.utils.GraphContentPrinter;
 import org.openerproject.double_propagation2.model.PartOfSpeech;
 import org.openerproject.double_propagation2.model.Word;
 import org.openerproject.double_propagation2.multiwords.MultiwordReader;
@@ -43,13 +45,13 @@ public class CLI {
 		Option inputDir=OptionBuilder.hasArg(true).isRequired(true).create("i");
 		inputDir.setDescription("Path to the directory containing the corpus files");
 		Option outputDir=OptionBuilder.hasArg(true).isRequired(false).create("o");
-		outputDir.setDescription("Folder in which collocations and/or double-propagation results will be stored");
+		outputDir.setDescription("Folder in which double-propagation results will be stored");
 		Option multiwordsFile=OptionBuilder.hasArg(true).isRequired(false).create("m");
 		multiwordsFile.setDescription("Path to the file containing precomputed multiword terms");
 		Option language=OptionBuilder.hasArg(true).isRequired(false).create("l");
-		language.setDescription("Language of the corpus files content, to use when preprocessing them");
+		language.setDescription("Language of the corpus files content, to use when preprocessing them (NOTE: for now only English allowed)");
 		
-		Option help=OptionBuilder.hasArg(true).isRequired(false).create("h");
+		Option help=OptionBuilder.isRequired(false).create("h");
 		help.setDescription("Prints this message");
 		
 		options.addOption(inputDir);
@@ -108,12 +110,13 @@ public class CLI {
 			DoublePropagationGraph dpGraph= doublePropagator.getDoublePropagationGraph();
     		DoublePropagationGraphSerializer doublePropagationGraphSerializer=new DoublePropagationGraphObjectSerializer();
     		doublePropagationGraphSerializer.serialize(dpGraph, CorpusHandlingUtils.generateUniqueFileName(outputDirPath+File.separator+"DoublePropagationGraph.obj"));
-			
+			GraphContentPrinter.printAspectTerms(dpGraph,new FileOutputStream(new File(CorpusHandlingUtils.generateUniqueFileName(outputDirPath+File.separator+"ranked-aspect-term-list.txt"))));
+    		
 		}catch(Exception e){
-			e.printStackTrace();
+			//e.printStackTrace();
 			log.error(e);
 			HelpFormatter formatter = new HelpFormatter();
-        	formatter.printHelp( "java -jar [NAME_OF_THE_JAR] [OPTION]", options );
+        	formatter.printHelp( "java -jar [NAME_OF_THE_JAR] [OPTION_1] .. [OPTION_N]", options );
 		}
 	}
 

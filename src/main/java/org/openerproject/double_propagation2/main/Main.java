@@ -35,6 +35,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import com.google.common.collect.Lists;
 
+@Deprecated
 public class Main {
 
 private static Logger log=Logger.getLogger(Main.class);

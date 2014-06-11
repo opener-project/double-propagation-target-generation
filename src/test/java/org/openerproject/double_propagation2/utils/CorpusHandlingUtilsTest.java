@@ -11,15 +11,15 @@ public class CorpusHandlingUtilsTest {
 	public void setUp() throws Exception {
 	}
 
-	@Test
-	public void testGetFilesFromDir() {
-		fail("Not yet implemented");
-	}
+//	@Test
+//	public void testGetFilesFromDir() {
+//		fail("Not yet implemented");
+//	}
 
-	@Test
-	public void testWriteTextsToFiles() {
-		fail("Not yet implemented");
-	}
+//	@Test
+//	public void testWriteTextsToFiles() {
+//		fail("Not yet implemented");
+//	}
 
 	@Test
 	public void testGenerateUniqueFileName() {
