@@ -1,4 +1,4 @@
-package org.openerproject.double_propagation2.algorithm;
+package org.openerproject.double_propagation2.analysis;
 
 import java.util.List;
 import java.util.Properties;
@@ -43,7 +43,7 @@ public class StanfordBasedCorpusAnalyzer implements CorpusAnalyzer{
 		int total=texts.size();
 		for(String text:texts){
 			textCount++;
-			log.info("Analyzing text number "+textCount+" of "+total);
+			log.info("Analyzing text number "+textCount+" of "+total+" (Text length: "+text.length()+")");
 			intraSentenceRelations.addAll(getIntraSentenceWordRelations(text));
 		}
 		return intraSentenceRelations;

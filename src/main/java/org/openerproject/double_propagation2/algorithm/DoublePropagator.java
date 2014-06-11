@@ -15,6 +15,7 @@ import org.openerproject.double_propagation2.algorithm.rules.Rule_3_1;
 import org.openerproject.double_propagation2.algorithm.rules.Rule_3_2;
 import org.openerproject.double_propagation2.algorithm.rules.Rule_4_1;
 import org.openerproject.double_propagation2.algorithm.rules.Rule_4_2;
+import org.openerproject.double_propagation2.analysis.CorpusAnalyzer;
 import org.openerproject.double_propagation2.graph.DoublePropagationGraph;
 import org.openerproject.double_propagation2.graph.DpNode;
 import org.openerproject.double_propagation2.model.DoublePropagationWordType;

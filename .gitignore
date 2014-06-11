@@ -4,3 +4,4 @@
 target/
 MAIN_OUTPUT*/
 log/
+dependency-reduced-pom.xml

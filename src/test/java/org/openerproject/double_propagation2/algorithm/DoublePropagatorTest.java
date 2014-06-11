@@ -8,6 +8,7 @@ import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.openerproject.double_propagation2.analysis.StanfordBasedCorpusAnalyzer;
 import org.openerproject.double_propagation2.model.PartOfSpeech;
 import org.openerproject.double_propagation2.model.Word;
 

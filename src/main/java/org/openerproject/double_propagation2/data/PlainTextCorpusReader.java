@@ -25,7 +25,14 @@ public class PlainTextCorpusReader implements CorpusReader{
 	@Override
 	public List<String> readCorpusDirectoryFileContent(String dirPath) {
 		try {
-			List<File> files = CorpusHandlingUtils.getFilesFromDir(dirPath);
+			File f=new File(dirPath);
+			List<File>files= null;
+			if(f.exists() && f.isFile()){
+				files=Lists.newArrayList(f);
+			}else{
+				files = CorpusHandlingUtils.getFilesFromDir(dirPath);
+			}
+			
 			List<String>results=Lists.newArrayList();
 			for(File corpusFile:files){
 				String fileContent=FileUtils.readFileToString(corpusFile, "UTF-8");

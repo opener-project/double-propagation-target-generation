@@ -16,7 +16,7 @@ public class CorpusHandlingUtils {
 	public static List<File>getFilesFromDir(String pathToDir){
 		File dir=new File(pathToDir);
 		List<File>corpusFiles=Lists.newArrayList();
-		if(dir.exists()){
+		if(dir.exists() && dir.isDirectory()){
 			for(File f:dir.listFiles()){
 				if(f.isFile()){
 					corpusFiles.add(f);
@@ -24,7 +24,7 @@ public class CorpusHandlingUtils {
 			}
 			return corpusFiles;
 		}else{
-			throw new RuntimeException("Provided corpus directory does not exists: "+dir.getAbsolutePath());
+			throw new RuntimeException("Provided corpus path does not exist or is not directory: "+dir.getAbsolutePath());
 		}
 	}
 	

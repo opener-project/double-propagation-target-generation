@@ -1,4 +1,4 @@
-package org.openerproject.double_propagation2.algorithm;
+package org.openerproject.double_propagation2.analysis;
 
 import java.util.List;
 
