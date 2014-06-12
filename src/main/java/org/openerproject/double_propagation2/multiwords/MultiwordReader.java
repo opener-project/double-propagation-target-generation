@@ -16,7 +16,8 @@ public class MultiwordReader {
 			List<String> lines = FileUtils.readLines(f, "UTF-8");
 			List<String> multiwords = Lists.newArrayList();
 				for(String line:lines){
-					multiwords.add(line.split("->")[1].trim());
+//					multiwords.add(line.split("->")[1].trim());
+					multiwords.add(line.trim());
 				}
 				return multiwords;
 		} catch (IOException e) {

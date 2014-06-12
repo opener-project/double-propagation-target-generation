@@ -1,16 +1,16 @@
 package org.openerproject.double_propagation2.main;
 
-import java.io.File;
-import java.util.Arrays;
+//import java.io.File;
 //import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+//import java.util.Arrays;
+//import java.util.HashSet;
+//import java.util.List;
+//import java.util.Set;
 
-import org.apache.commons.cli.BasicParser;
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.HelpFormatter;
+//import org.apache.commons.cli.BasicParser;
+//import org.apache.commons.cli.CommandLine;
+//import org.apache.commons.cli.CommandLineParser;
+//import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.OptionGroup;
@@ -18,32 +18,32 @@ import org.apache.commons.cli.OptionGroup;
 //import org.apache.commons.cli.OptionBuilder;
 //import org.apache.commons.cli.OptionGroup;
 import org.apache.commons.cli.Options;
-import org.apache.log4j.Logger;
-import org.openerproject.double_propagation2.algorithm.DoublePropagator;
-import org.openerproject.double_propagation2.data.PlainTextCorpusReader;
-import org.openerproject.double_propagation2.graph.DoublePropagationGraph;
-import org.openerproject.double_propagation2.graph.utils.DoublePropagationGraphObjectSerializer;
-import org.openerproject.double_propagation2.graph.utils.DoublePropagationGraphSerializer;
-import org.openerproject.double_propagation2.model.PartOfSpeech;
-import org.openerproject.double_propagation2.model.Word;
-import org.openerproject.double_propagation2.multiwords.MultiwordGenerator;
-import org.openerproject.double_propagation2.multiwords.MultiwordReader;
-import org.openerproject.double_propagation2.multiwords.NGramAndScore;
-import org.openerproject.double_propagation2.utils.CorpusHandlingUtils;
+//import org.apache.log4j.Logger;
+//import org.openerproject.double_propagation2.algorithm.DoublePropagator;
+//import org.openerproject.double_propagation2.data.PlainTextCorpusReader;
+//import org.openerproject.double_propagation2.graph.DoublePropagationGraph;
+//import org.openerproject.double_propagation2.graph.utils.DoublePropagationGraphObjectSerializer;
+//import org.openerproject.double_propagation2.graph.utils.DoublePropagationGraphSerializer;
+//import org.openerproject.double_propagation2.model.PartOfSpeech;
+//import org.openerproject.double_propagation2.model.Word;
+//import org.openerproject.double_propagation2.multiwords.MultiwordGenerator;
+//import org.openerproject.double_propagation2.multiwords.MultiwordReader;
+//import org.openerproject.double_propagation2.multiwords.NGramAndScore;
+//import org.openerproject.double_propagation2.utils.CorpusHandlingUtils;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-import com.google.common.collect.Lists;
+//import com.google.common.collect.Lists;
 
 @Deprecated
 public class Main {
 
-private static Logger log=Logger.getLogger(Main.class);
+//private static Logger log=Logger.getLogger(Main.class);
 	
 	private static ApplicationContext appContext;
 	
 	private static Options options;
-	private static Set<String>validLangs=new HashSet<String>(Lists.newArrayList("en","es","fr","it","nl","de"));
+//	private static Set<String>validLangs=new HashSet<String>(Lists.newArrayList("en","es","fr","it","nl","de"));
 
 	static{
 		options = new Options();
@@ -266,126 +266,126 @@ private static Logger log=Logger.getLogger(Main.class);
 //	}
 	
 	public static void execute2(String[]args){
-		log.debug("Arguments: "+Arrays.toString(args));
-		CommandLineParser parser=new BasicParser();
-		try{
-			CommandLine line=parser.parse(options, args);
-			String inputDir=line.getOptionValue("i");
-			String outputDir=line.getOptionValue("o");
-			String multiwordsFile=line.hasOption("mwf")?line.getOptionValue("mwf"):null;
-			int multiwordNgramSize=line.hasOption("mwns")?Integer.parseInt(line.getOptionValue("mwns")):2;
-			int multiwordListLimit=line.hasOption("mwll")?Integer.parseInt(line.getOptionValue("mwll")):100;
-			boolean alreadyInKaf=line.hasOption("kaf");
-			boolean disableMultiwords=line.hasOption("nomw");
-			String language=line.getOptionValue("l");
-			
-			if(line.hasOption("mw")){
-				MultiwordGenerator multiwordGenerator=(MultiwordGenerator) getBeanFromContainer("multiwordGenerator");
-        		log.info("Launching multiword generator with params: corpus-dir="+inputDir+" ; lang="+language+" ; alreadyInKaf="+alreadyInKaf+" ; output-folder"+outputDir);
-        		List<NGramAndScore> rankedNgrams = multiwordGenerator.generateMultiwords(inputDir, language, alreadyInKaf, multiwordNgramSize, multiwordListLimit, outputDir);
-        		String pathToFile=multiwordGenerator.writeMultiwordsToFile(rankedNgrams, outputDir);
-        		log.info("Generated multiwords written to "+pathToFile);
-			}else if(line.hasOption("dp")){
-				DoublePropagator doublePropagator=(DoublePropagator) getBeanFromContainer("doublePropagator");
-				List<String> multiwords=Lists.newArrayList();
-				if(!disableMultiwords){
-					if(multiwordsFile!=null){
-						multiwords=MultiwordReader.readMultiwordFile(multiwordsFile);
-					}else{
-						MultiwordGenerator multiwordGenerator=(MultiwordGenerator) getBeanFromContainer("multiwordGenerator");
-		        		log.info("Launching multiword generator with params: corpus-dir="+inputDir+" ; lang="+language+" ; alreadyInKaf="+alreadyInKaf+" ; output-folder"+outputDir);
-		        		List<NGramAndScore> rankedNgrams = multiwordGenerator.generateMultiwords(inputDir, language, alreadyInKaf, multiwordNgramSize, multiwordListLimit, outputDir);
-		        		String pathToFile=multiwordGenerator.writeMultiwordsToFile(rankedNgrams, outputDir);
-		        		log.info("Generated multiwords written to "+pathToFile);
-		        		multiwords=MultiwordReader.readMultiwordFile(pathToFile);
-					}
-				}else{
-					log.info("Multiwords disabled");
-				}
-				PlainTextCorpusReader plainTextCorpusReader=new PlainTextCorpusReader();
-        		List<String> corpusFilesContent = plainTextCorpusReader.readCorpusDirectoryFileContent(inputDir);//"C:\\Users\\yo\\Desktop\\git_repos\\target-properties\\CORPUS\\ALL_ENGLISH_REVIEWS.txt"));
-        		//List<String>corpus=Lists.newArrayList(corpusContent.split("\n"));
-        		Set<Word> seedOpinionWords=new HashSet<Word>();
-        		seedOpinionWords.add(Word.createWord("good", "good", PartOfSpeech.ADJECTIVE, 0, 0));
-        		seedOpinionWords.add(Word.createWord("bad", "bad", PartOfSpeech.ADJECTIVE, 0, 0));
-        		Set<Word> seedtargetWords=new HashSet<Word>();
-        		boolean detectMultiwords=!disableMultiwords;
-				doublePropagator.executeDoublePropagation(corpusFilesContent, seedOpinionWords, seedtargetWords, language, detectMultiwords, multiwords);
-				DoublePropagationGraph dpGraph= doublePropagator.getDoublePropagationGraph();
-        		DoublePropagationGraphSerializer doublePropagationGraphSerializer=new DoublePropagationGraphObjectSerializer();
-        		doublePropagationGraphSerializer.serialize(dpGraph, CorpusHandlingUtils.generateUniqueFileName(outputDir+File.separator+"DoublePropagationGraph.obj"));
-			}
-			
-			
-		}catch(Exception e){
-			e.printStackTrace();
-		}
+//		log.debug("Arguments: "+Arrays.toString(args));
+//		CommandLineParser parser=new BasicParser();
+//		try{
+//			CommandLine line=parser.parse(options, args);
+//			String inputDir=line.getOptionValue("i");
+//			String outputDir=line.getOptionValue("o");
+//			String multiwordsFile=line.hasOption("mwf")?line.getOptionValue("mwf"):null;
+//			int multiwordNgramSize=line.hasOption("mwns")?Integer.parseInt(line.getOptionValue("mwns")):2;
+//			int multiwordListLimit=line.hasOption("mwll")?Integer.parseInt(line.getOptionValue("mwll")):100;
+//			boolean alreadyInKaf=line.hasOption("kaf");
+//			boolean disableMultiwords=line.hasOption("nomw");
+//			String language=line.getOptionValue("l");
+//			
+//			if(line.hasOption("mw")){
+//				MultiwordGenerator multiwordGenerator=(MultiwordGenerator) getBeanFromContainer("multiwordGenerator");
+//        		log.info("Launching multiword generator with params: corpus-dir="+inputDir+" ; lang="+language+" ; alreadyInKaf="+alreadyInKaf+" ; output-folder"+outputDir);
+//        		List<NGramAndScore> rankedNgrams = multiwordGenerator.generateMultiwords(inputDir, language, alreadyInKaf, multiwordNgramSize, multiwordListLimit, outputDir);
+//        		String pathToFile=multiwordGenerator.writeMultiwordsToFile(rankedNgrams, outputDir);
+//        		log.info("Generated multiwords written to "+pathToFile);
+//			}else if(line.hasOption("dp")){
+//				DoublePropagator doublePropagator=(DoublePropagator) getBeanFromContainer("doublePropagator");
+//				List<String> multiwords=Lists.newArrayList();
+//				if(!disableMultiwords){
+//					if(multiwordsFile!=null){
+//						multiwords=MultiwordReader.readMultiwordFile(multiwordsFile);
+//					}else{
+//						MultiwordGenerator multiwordGenerator=(MultiwordGenerator) getBeanFromContainer("multiwordGenerator");
+//		        		log.info("Launching multiword generator with params: corpus-dir="+inputDir+" ; lang="+language+" ; alreadyInKaf="+alreadyInKaf+" ; output-folder"+outputDir);
+//		        		List<NGramAndScore> rankedNgrams = multiwordGenerator.generateMultiwords(inputDir, language, alreadyInKaf, multiwordNgramSize, multiwordListLimit, outputDir);
+//		        		String pathToFile=multiwordGenerator.writeMultiwordsToFile(rankedNgrams, outputDir);
+//		        		log.info("Generated multiwords written to "+pathToFile);
+//		        		multiwords=MultiwordReader.readMultiwordFile(pathToFile);
+//					}
+//				}else{
+//					log.info("Multiwords disabled");
+//				}
+//				PlainTextCorpusReader plainTextCorpusReader=new PlainTextCorpusReader();
+//        		List<String> corpusFilesContent = plainTextCorpusReader.readCorpusDirectoryFileContent(inputDir);//"C:\\Users\\yo\\Desktop\\git_repos\\target-properties\\CORPUS\\ALL_ENGLISH_REVIEWS.txt"));
+//        		//List<String>corpus=Lists.newArrayList(corpusContent.split("\n"));
+//        		Set<Word> seedOpinionWords=new HashSet<Word>();
+//        		seedOpinionWords.add(Word.createWord("good", "good", PartOfSpeech.ADJECTIVE, 0, 0));
+//        		seedOpinionWords.add(Word.createWord("bad", "bad", PartOfSpeech.ADJECTIVE, 0, 0));
+//        		Set<Word> seedtargetWords=new HashSet<Word>();
+//        		boolean detectMultiwords=!disableMultiwords;
+//				doublePropagator.executeDoublePropagation(corpusFilesContent, seedOpinionWords, seedtargetWords, language, detectMultiwords, multiwords);
+//				DoublePropagationGraph dpGraph= doublePropagator.getDoublePropagationGraph();
+//        		DoublePropagationGraphSerializer doublePropagationGraphSerializer=new DoublePropagationGraphObjectSerializer();
+//        		doublePropagationGraphSerializer.serialize(dpGraph, CorpusHandlingUtils.generateUniqueFileName(outputDir+File.separator+"DoublePropagationGraph.obj"));
+//			}
+//			
+//			
+//		}catch(Exception e){
+//			e.printStackTrace();
+//		}
 	}
 	
 	public static void execute(String[]args){
-		CommandLineParser parser = new BasicParser();
-		try {
-	        // parse the command line arguments
-	        CommandLine line = parser.parse( options, args );
-	        if(line.hasOption("op")){
-	        	String operation=line.getOptionValue("op");
-	        	boolean isKaf=line.hasOption("kaf");
-	        	String pathToCorpusDir=line.getOptionValue("d");
-	        	String outputPath=line.getOptionValue("out");
-	        	//String pathToCollocsFile=line.getOptionValue("c")
-	        	if(pathToCorpusDir==null || pathToCorpusDir.length()==0){
-	        		throw new RuntimeException("Path to folder with the corpus is missing!");
-	        	}
-	        	if(outputPath==null || outputPath.length()==0){
-	        		log.info("No output path defined, defaulting to current directory");
-	        		outputPath=".";//throw new RuntimeException("Path to folder with the corpus is missing!");
-	        	}
-	        	String lang=line.getOptionValue("lang");
-	        	if(!validLangs.contains(lang)){
-	        		throw new RuntimeException("Invalid language: "+lang+"\nAllowed languages: "+validLangs.toString());
-	        	}
-	        	String collocNgramSize=line.getOptionValue("collocNgramSize");
-	        	if(collocNgramSize==null || collocNgramSize.length()==0){
-	        		log.info("No collocNgramSize set, using default: 2");
-	        		collocNgramSize="2";
-	        	}
-	        	String collocListSizeLimit=line.getOptionValue("collocListSize");
-	        	if(collocListSizeLimit==null || collocListSizeLimit.length()==0){
-	        		log.info("No collocListSizeLimit set, using default: 100");
-	        		collocListSizeLimit="100";
-	        	}
-	        	//if()
-	        	
-	        	//SemanticVectorProcess semanticVectorProcess=(SemanticVectorProcess) getBeanFromContainer("SemanticVectorProcess");
-	        	if(operation.equals("collocs")){
-	        		MultiwordGenerator multiwordGenerator=(MultiwordGenerator) getBeanFromContainer("multiwordGenerator");
-	        		log.info("Launching multiword generator with params: corpus-dir="+pathToCorpusDir+" ; lang="+lang+" ; alreadyInKaf="+isKaf+" ; output-folder"+outputPath);
-	        		multiwordGenerator.generateMultiwords(pathToCorpusDir, lang, isKaf, Integer.parseInt(collocNgramSize), Integer.parseInt(collocListSizeLimit), outputPath);
-	        	}else if(operation.equals("doubleprop")){
-	        		DoublePropagator doublePropagator=(DoublePropagator) getBeanFromContainer("doublePropagator");
-	        		////////// AD-HOC STUFF, REMOVE AFTER TEST IT ///////////
-	        		PlainTextCorpusReader plainTextCorpusReader=new PlainTextCorpusReader();
-	        		List<String> corpusContent = plainTextCorpusReader.readCorpusDirectoryFileContent(pathToCorpusDir);//"C:\\Users\\yo\\Desktop\\git_repos\\target-properties\\CORPUS\\ALL_ENGLISH_REVIEWS.txt"));
-	        		//List<String>corpus=Lists.newArrayList(corpusContent.split("\n"));
-	        		Set<Word> seedOpinionWords=new HashSet<Word>();
-	        		seedOpinionWords.add(Word.createWord("good", "good", PartOfSpeech.ADJECTIVE, 0, 0));
-	        		seedOpinionWords.add(Word.createWord("bad", "bad", PartOfSpeech.ADJECTIVE, 0, 0));
-	        		Set<Word> seedtargetWords=new HashSet<Word>();
-					/////////////////////////////////////////////////////////
-	        		doublePropagator.executeDoublePropagation(corpusContent.subList(0, 1000), seedOpinionWords, seedtargetWords, lang,false,null);
-	        		DoublePropagationGraph dpGraph= doublePropagator.getDoublePropagationGraph();
-	        		DoublePropagationGraphSerializer doublePropagationGraphSerializer=new DoublePropagationGraphObjectSerializer();
-	        		doublePropagationGraphSerializer.serialize(dpGraph, outputPath+File.separator+"DoublePropagationGraph.obj");
-	        	}
-	        	
-	        }else{
-	        	HelpFormatter formatter = new HelpFormatter();
-	        	formatter.printHelp( "java -jar [NAME_OF_THE_JAR] [OPTION]", options );
-	        }
-	        
-		}catch(Exception e){
-			e.printStackTrace();
-		}
+//		CommandLineParser parser = new BasicParser();
+//		try {
+//	        // parse the command line arguments
+//	        CommandLine line = parser.parse( options, args );
+//	        if(line.hasOption("op")){
+//	        	String operation=line.getOptionValue("op");
+//	        	boolean isKaf=line.hasOption("kaf");
+//	        	String pathToCorpusDir=line.getOptionValue("d");
+//	        	String outputPath=line.getOptionValue("out");
+//	        	//String pathToCollocsFile=line.getOptionValue("c")
+//	        	if(pathToCorpusDir==null || pathToCorpusDir.length()==0){
+//	        		throw new RuntimeException("Path to folder with the corpus is missing!");
+//	        	}
+//	        	if(outputPath==null || outputPath.length()==0){
+//	        		log.info("No output path defined, defaulting to current directory");
+//	        		outputPath=".";//throw new RuntimeException("Path to folder with the corpus is missing!");
+//	        	}
+//	        	String lang=line.getOptionValue("lang");
+//	        	if(!validLangs.contains(lang)){
+//	        		throw new RuntimeException("Invalid language: "+lang+"\nAllowed languages: "+validLangs.toString());
+//	        	}
+//	        	String collocNgramSize=line.getOptionValue("collocNgramSize");
+//	        	if(collocNgramSize==null || collocNgramSize.length()==0){
+//	        		log.info("No collocNgramSize set, using default: 2");
+//	        		collocNgramSize="2";
+//	        	}
+//	        	String collocListSizeLimit=line.getOptionValue("collocListSize");
+//	        	if(collocListSizeLimit==null || collocListSizeLimit.length()==0){
+//	        		log.info("No collocListSizeLimit set, using default: 100");
+//	        		collocListSizeLimit="100";
+//	        	}
+//	        	//if()
+//	        	
+//	        	//SemanticVectorProcess semanticVectorProcess=(SemanticVectorProcess) getBeanFromContainer("SemanticVectorProcess");
+//	        	if(operation.equals("collocs")){
+//	        		MultiwordGenerator multiwordGenerator=(MultiwordGenerator) getBeanFromContainer("multiwordGenerator");
+//	        		log.info("Launching multiword generator with params: corpus-dir="+pathToCorpusDir+" ; lang="+lang+" ; alreadyInKaf="+isKaf+" ; output-folder"+outputPath);
+//	        		multiwordGenerator.generateMultiwords(pathToCorpusDir, lang, isKaf, Integer.parseInt(collocNgramSize), Integer.parseInt(collocListSizeLimit), outputPath);
+//	        	}else if(operation.equals("doubleprop")){
+//	        		DoublePropagator doublePropagator=(DoublePropagator) getBeanFromContainer("doublePropagator");
+//	        		////////// AD-HOC STUFF, REMOVE AFTER TEST IT ///////////
+//	        		PlainTextCorpusReader plainTextCorpusReader=new PlainTextCorpusReader();
+//	        		List<String> corpusContent = plainTextCorpusReader.readCorpusDirectoryFileContent(pathToCorpusDir);//"C:\\Users\\yo\\Desktop\\git_repos\\target-properties\\CORPUS\\ALL_ENGLISH_REVIEWS.txt"));
+//	        		//List<String>corpus=Lists.newArrayList(corpusContent.split("\n"));
+//	        		Set<Word> seedOpinionWords=new HashSet<Word>();
+//	        		seedOpinionWords.add(Word.createWord("good", "good", PartOfSpeech.ADJECTIVE, 0, 0));
+//	        		seedOpinionWords.add(Word.createWord("bad", "bad", PartOfSpeech.ADJECTIVE, 0, 0));
+//	        		Set<Word> seedtargetWords=new HashSet<Word>();
+//					/////////////////////////////////////////////////////////
+//	        		doublePropagator.executeDoublePropagation(corpusContent.subList(0, 1000), seedOpinionWords, seedtargetWords, lang,false,null);
+//	        		DoublePropagationGraph dpGraph= doublePropagator.getDoublePropagationGraph();
+//	        		DoublePropagationGraphSerializer doublePropagationGraphSerializer=new DoublePropagationGraphObjectSerializer();
+//	        		doublePropagationGraphSerializer.serialize(dpGraph, outputPath+File.separator+"DoublePropagationGraph.obj");
+//	        	}
+//	        	
+//	        }else{
+//	        	HelpFormatter formatter = new HelpFormatter();
+//	        	formatter.printHelp( "java -jar [NAME_OF_THE_JAR] [OPTION]", options );
+//	        }
+//	        
+//		}catch(Exception e){
+//			e.printStackTrace();
+//		}
 	}
 
 	protected static Object getBeanFromContainer(String beanName){
