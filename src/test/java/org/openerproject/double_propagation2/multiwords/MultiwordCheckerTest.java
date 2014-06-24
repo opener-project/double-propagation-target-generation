@@ -35,4 +35,9 @@ public class MultiwordCheckerTest {
 		assertTrue(true);
 	}
 
+//	@Test
+//	public void testCheckMultiwords2(){
+//		
+//	}
+	
 }

@@ -137,7 +137,7 @@ public class IntraSentenceWordRelations {
 		return sentenceWords.size();
 	}
 	
-	protected void populateSpanToWorNumberMap(){
+	protected void populateSpanToWordNumberMap(){
 		spanToWordNumberMap=new HashMap<String,Integer>();
 		for(int wordNumber=0;wordNumber<sentenceWords.size();wordNumber++){
 			Word word=sentenceWords.get(wordNumber);
@@ -148,7 +148,7 @@ public class IntraSentenceWordRelations {
 	
 	public Integer getWordNumber(Word word){
 		if(spanToWordNumberMap==null){
-			populateSpanToWorNumberMap();
+			populateSpanToWordNumberMap();
 		}
 		Integer wordNumber=spanToWordNumberMap.get(word.getSpanSignature());
 		if(wordNumber==null){
@@ -202,7 +202,7 @@ public class IntraSentenceWordRelations {
 			}
 		}
 		this.sentenceWords=mergedWords;
-		populateSpanToWorNumberMap();
+		populateSpanToWordNumberMap();
 		
 //		for(Entry<String, WordToWordRelation> entry:governorWordRelationMap.entries()){
 //			log.debug("GOVERNOR_MAP:"+entry);

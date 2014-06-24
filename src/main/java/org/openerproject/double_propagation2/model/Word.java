@@ -63,7 +63,7 @@ public class Word {
 	public static Word createMultiword(List<Word>singleWords) {
 		StringBuffer composedWordForm=new StringBuffer();
 		StringBuffer composedLemma=new StringBuffer();
-		PartOfSpeech composedPosTag=PartOfSpeech.MULTIWORD;
+		PartOfSpeech composedPosTag=determineMultiwordPartOfSpeech(singleWords);//PartOfSpeech.MULTIWORD;
 		for(Word singleWord:singleWords){
 			composedWordForm.append(singleWord.wordForm);
 			composedWordForm.append(" ");
@@ -72,6 +72,18 @@ public class Word {
 		}
 		Word word=new Word(composedWordForm.toString().trim(), composedLemma.toString().trim(), composedPosTag, singleWords.get(0).span.begin, singleWords.get(singleWords.size()-1).span.end,singleWords);
 		return word;
+	}
+	
+	//Provisional! The postag must NOT be multiword in order to trigger the propagation rules, 
+	//so NOUN or ADJ is required. This naive loop assigns NOUN to any multiword containing a noun, and ADJ otherwise.
+	private static PartOfSpeech determineMultiwordPartOfSpeech(List<Word>composingWords){
+		for(Word composingWord:composingWords){
+			if(composingWord.getPostag()== PartOfSpeech.NOUN){
+				return PartOfSpeech.NOUN;
+			}
+		}
+		return PartOfSpeech.ADJECTIVE;
+//		return PartOfSpeech.NOUN;
 	}
 
 	public String getWordForm() {

@@ -72,7 +72,9 @@ public class CLI {
 			//then we can simulate the arguments
 			//args=new String[]{"-op","collocs","-d","../../target-properties/EN_REVIEWS_KAF","-lang","en","-out","MAIN_OUTPUT","-kaf"};
 			//Call for the doubleprop
-			args=new String[]{"-i","C:\\Users\\agarciap\\Data\\REVIEWS_DATA\\ENGLISH_REVIEWS_MINI.txt","-o","MAIN_OUTPUT"};
+//			args=new String[]{"-i","C:\\Users\\agarciap\\Data\\REVIEWS_DATA\\ENGLISH_REVIEWS_MINI.txt","-o","MAIN_OUTPUT"};
+			args=new String[]{"-i","C:\\Users\\agarciap\\Data\\DATASETS_FOR_EXPERIMENTS\\HU_LIU_CUSTOMER_REVIEW\\PLAIN\\PLAIN_HU_LIU_CREATIVE_LABS_NOMAD_JUKEBOX.txt","-o","MAIN_OUTPUT"
+					,"-m","C:\\Users\\agarciap\\Data\\DATASETS_FOR_EXPERIMENTS\\HU_LIU_CUSTOMER_REVIEW\\GENERATED_MULTIWORDS\\creative_labs_nomad_jukebox_zen_xtra_40gb_multiwords_20140624.txt"};
 		}
 		execute(args);
 		
@@ -100,10 +102,14 @@ public class CLI {
 			log.debug("Inpur dir: "+inputPath);
 			PlainTextCorpusReader plainTextCorpusReader=new PlainTextCorpusReader();
     		List<String> corpusFilesContent = plainTextCorpusReader.readCorpusDirectoryFileContent(inputPath);//"C:\\Users\\yo\\Desktop\\git_repos\\target-properties\\CORPUS\\ALL_ENGLISH_REVIEWS.txt"));
+    		////DELETE THIS; JUST A QUICK TEST
+    		//corpusFilesContent=corpusFilesContent.subList(0, 30);
+    		/////////////////////////////////////
     		//List<String>corpus=Lists.newArrayList(corpusContent.split("\n"));
     		Set<Word> seedOpinionWords=new HashSet<Word>();
     		seedOpinionWords.add(Word.createWord("good", "good", PartOfSpeech.ADJECTIVE, 0, 0));
     		seedOpinionWords.add(Word.createWord("bad", "bad", PartOfSpeech.ADJECTIVE, 0, 0));
+    		//seedOpinionWords.add(Word.createWord("short", "short", PartOfSpeech.ADVERB, 0, 0));
     		Set<Word> seedtargetWords=new HashSet<Word>();
     		boolean detectMultiwords=!multiwords.isEmpty();
 			doublePropagator.executeDoublePropagation(corpusFilesContent, seedOpinionWords, seedtargetWords, language, detectMultiwords, multiwords);
